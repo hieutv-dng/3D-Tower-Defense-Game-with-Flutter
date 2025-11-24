@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flame/components.dart';
+import 'package:flame_3d/game.dart'; // For Vector3 if needed
 import 'enemy.dart';
 
 class EnemySpawner extends Component {
@@ -24,18 +25,27 @@ class EnemySpawner extends Component {
 
   void _spawnEnemy() {
     // Spawn at random X at fixed Z (top of screen relative to defender)
-    // Defender is at Z=4. Camera at Z=15 looking at 0.
-    // Top of screen is negative Z.
-    // Let's spawn at Z = -10.
-    // X range: -8 to 8 (approx arena width).
+    // Defender is at Z=8. Camera at Z=20 looking at 0.
+    // Let's spawn at Z = -15 (further back).
     
     final x = (_rng.nextDouble() * 16) - 8;
-    final z = -10.0;
+    final z = -15.0;
+    
+    final typeRoll = _rng.nextDouble();
+    EnemyType type;
+    if (typeRoll < 0.6) {
+      type = EnemyType.standard;
+    } else if (typeRoll < 0.85) {
+      type = EnemyType.fast;
+    } else {
+      type = EnemyType.heavy;
+    }
     
     parent?.add(
       Enemy(
         position: Vector3(x, 0, z),
         targetPosition: targetPosition,
+        type: type,
       ),
     );
   }

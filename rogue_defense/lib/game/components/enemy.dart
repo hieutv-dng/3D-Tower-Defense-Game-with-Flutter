@@ -3,22 +3,59 @@ import 'package:flame_3d/game.dart';
 import 'package:flame_3d/components.dart';
 import 'package:flame_3d/resources.dart';
 
+enum EnemyType {
+  standard,
+  fast,
+  heavy,
+}
+
 class Enemy extends MeshComponent {
   final Vector3 targetPosition;
-  final double speed = 2.0;
+  late double speed;
+  final EnemyType type;
 
   Enemy({
     required Vector3 position,
     required this.targetPosition,
-  }) : super(
-          mesh: CuboidMesh(
-            size: Vector3(0.8, 0.8, 0.8),
-            material: SpatialMaterial(
-              albedoColor: const Color(0xFFFF0000), // Neon Red
-            ),
+    this.type = EnemyType.standard,
+  }) : super(position: position) {
+    _setupEnemy();
+  }
+
+  void _setupEnemy() {
+    switch (type) {
+      case EnemyType.standard:
+        speed = 3.0;
+        mesh = CuboidMesh(
+          size: Vector3(0.8, 0.8, 0.8),
+          material: SpatialMaterial(
+            albedoColor: const Color(0xFFFF0000), // Red
+            metallic: 0.5,
           ),
-          position: position,
         );
+        break;
+      case EnemyType.fast:
+        speed = 5.0;
+        mesh = CuboidMesh(
+          size: Vector3(0.5, 0.5, 0.5),
+          material: SpatialMaterial(
+            albedoColor: const Color(0xFFFFFF00), // Yellow
+            metallic: 0.5,
+          ),
+        );
+        break;
+      case EnemyType.heavy:
+        speed = 1.5;
+        mesh = CuboidMesh(
+          size: Vector3(1.2, 1.2, 1.2),
+          material: SpatialMaterial(
+            albedoColor: const Color(0xFF800080), // Purple
+            metallic: 0.5,
+          ),
+        );
+        break;
+    }
+  }
 
   @override
   void update(double dt) {
@@ -26,7 +63,7 @@ class Enemy extends MeshComponent {
     
     // Move towards target
     final direction = targetPosition - position;
-    direction.y = 0;
+    direction.y = 0; // Keep movement on the ground plane
     
     if (direction.length > 0.1) {
       direction.normalize();
